@@ -13,11 +13,8 @@ class Dp{
     constructor(options){
         this.options = options;
         this.init();
-        this.domReference.addEventListener("focus",function(){
-            document.getElementById("cal").classList.add("show");
-        });
-        this.render();
-        this.domReference.addEventListener("focus",this.showCal.bind(this));
+        this.domReference.addEventListener("click",this.showCal.bind(this));
+        this.setDate();
 
     }
     
@@ -56,7 +53,6 @@ class Dp{
         this.dateDom = this.getNewDateUi();
         this.yearDom = this.getNewYearUi();
         this.calenderDom = this.getCalenderDom();
-        this.setDate();
     }
 
     setSelected(){
@@ -168,12 +164,6 @@ class Dp{
         return wrapper;
     }
 
-    monthMouseOver(monthIndex,option){
-        console.log(this.monthNames[monthIndex]);
-        option.selected = "selected";
-        this.selected.month = monthIndex + 1;
-        console.log(this.selected);
-    }
 
     setMonthName(index){
         console.log(this.monthNames[index]);
@@ -216,12 +206,6 @@ class Dp{
         target.appendChild(option);
     }
 
-    yearMouseOver(year,option){
-        console.log(year)
-        option.selected = "selected";
-        this.selected.year = year;
-        console.log(this.selected);
-    }
 
     getNewDateUi(){
         const {year,month} = this.selected;
@@ -266,13 +250,6 @@ class Dp{
         lowershadow.classList.add("lower-shadow");
         wrapper.appendChild(lowershadow);
         return wrapper;
-    }
-
-    dayMouseOver(day,option){
-        console.log(day);
-        option.selected = "selected";
-        this.selected.day = day;
-        console.log(this.selected);
     }
 
     getNewTimeUi(){
@@ -424,21 +401,6 @@ class Dp{
         }
     }
 
-
-    hourMouseOver(hour,option){
-        console.log(hour);
-        option.selected = "selected";
-        this.selected.hour = hour;
-        console.log(this.selected);
-    }
-
-    minuteMouseOver(minute,option){
-        console.log(minute);
-        option.selected = "selected";
-        this.selected.minute = minute;
-        console.log(this.selected);
-    }
-
     setDate(){
         var ampm = "AM";
         if(this.selected.hour >= 12){
@@ -446,10 +408,10 @@ class Dp{
         }
         this.domReference.value = `${
                                     this.selected.year + "-" + 
-                                    this.selected.month + "-" + 
+                                    (this.selected.month+1) + "-" + 
                                     this.selected.day + " " +
                                     this.selected.hour + ":" +
-                                    this.selected.minute + " " + ampm
+                                    this.selected.minute
                                 }`;  
     }
 
@@ -492,7 +454,7 @@ class Dp{
             elements[0].parentNode.removeChild(elements[0]);
         }
         var cal = document.createElement('div');
-        cal.classList.add("cal-wrapper");
+        //cal.classList.add("cal-wrapper"); 
         cal.id="cal";
         cal.appendChild(this.calenderDom);
         let buttons = document.createElement("div");
@@ -528,5 +490,39 @@ class Dp{
     setDateAndHide(){
         this.setDate();
         this.hideCal();
+    }
+
+    // Mouse Over */
+
+
+    minuteMouseOver(minute,option){
+        this.setSelectedOnmouseOver("minute",minute,option);
+    }
+    hourMouseOver(hour,option){
+        this.setSelectedOnmouseOver("hour",hour,option);
+    }
+    dayMouseOver(day,option){
+        this.setSelectedOnmouseOver("day",day,option);
+    }
+
+    monthMouseOver(month,option){
+        this.setSelectedOnmouseOver("month",month,option);
+    }
+
+    yearMouseOver(year,option){
+        this.setSelectedOnmouseOver("year",year,option);
+    }
+
+    setSelectedOnmouseOver(selectedProperty,value,domElement){
+        domElement.selected = value;
+        this.selected[selectedProperty] = value;
+        this.setDate();
+    }   
+
+    setMin(timestamp){
+
+    }
+    setMax(timestamp){
+
     }
 }

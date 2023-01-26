@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <title>Page Title</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+</head>
+<body>
+  
+</body>
+
+<script>
+
+var i = 0;
+var intval = setInterval(function(){
+  a();
+  if(i <= 20000){
+    clearInterval(intval);
+  }
+  i = i + 5000;
+},5000);
+
+function a(){
+  console.log("I am here");
+}
+a();
+
+</script>
+</html>
