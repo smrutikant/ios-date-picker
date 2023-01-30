@@ -15,7 +15,6 @@ class Dp{
         this.init();
         this.domReference.addEventListener("click",this.showCal.bind(this));
         this.setDate();
-
     }
     
     init(){
@@ -36,13 +35,15 @@ class Dp{
         this.theme = this.options.theme;
         this.calenderOption = this.options.calenderOption;
         this.domReference = this.options.target;
+        this.min = this.options.min?new Date(this.options.min).getTime()/1000:false;
+        this.max = this.options.max?new Date(this.options.max).getTime()/1000:false;
     }
 
     setCurrentCalenderInfo(){
         if(!this.options.hasOwnProperty('date')){
-            this.currentCalenderInfo = this.getBasic();
+            this.currentCalenderInfo = this.getBasic(new Date().getTime()/1000);
         }else{
-            this.currentCalenderInfo = this.getBasic(this.options.date);
+            this.currentCalenderInfo = this.getBasic(new Date(this.options.date).getTime()/1000);
         }
     }
 
@@ -148,7 +149,7 @@ class Dp{
             month_item.value = monthIndex;
             month_item.innerHTML = `${this.monthNames[monthIndex]}`;
 
-            if(this.selected.month == monthIndex + 1){
+            if(this.selected.month == monthIndex){
                 month_item.selected = "selected";
             }
 
@@ -419,63 +420,36 @@ class Dp{
         return new Date(year, month + 1, 0).getDate();
     }
 
-    getBasic(epoch = false){
-        var date = epoch ? new Date(epoch * 1000) : new Date;
-        var seconds = date.getSeconds();
-        var minutes = date.getMinutes();
-        var hour = date.getHours();
-        var year = date.getFullYear();
-        var month = date.getMonth(); // beware: January = 0; February = 1, etc.
-        var day = date.getDate();
-        var dayOfWeek = date.getDay(); // Sunday = 0, Monday = 1, etc.
-        var milliSeconds = date.getMilliseconds();
-        var days_in_months = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-        if( (new Date(year, 1, 29)).getDate() == 29 ) days_in_months[1] = 29;
-
-        var currentCalender = {
-            seconds:seconds,
-            minutes:minutes,
-            hour:hour,
-            year:year,
-            month:month,
-            monthName:this.monthNames[month],
-            day:day,
-            dayName:this.dayNames[dayOfWeek],
-            dayOfWeek:dayOfWeek,
-            milliSeconds:milliSeconds,
-            daysInMonths:days_in_months
-        }
-        return currentCalender;
-    }
-
     render(){
         const elements = document.getElementsByClassName("cal-wrapper");
-        while(elements.length > 0){
-            elements[0].parentNode.removeChild(elements[0]);
+        // while(elements.length > 0){
+        //     elements[0].parentNode.removeChild(elements[0]);
+        // }
+        if(elements.length === 0){
+            var cal = document.createElement('div');
+            cal.classList.add("cal-wrapper"); 
+            cal.id="cal";
+            cal.appendChild(this.calenderDom);
+            let buttons = document.createElement("div");
+            buttons.classList.add('action');
+
+            let setButton = document.createElement("button");
+            setButton.addEventListener("click",this.setDateAndHide.bind(this));
+            setButton.innerText = "Set";
+            setButton.classList.add("setbtn");
+
+
+            let cancelButton = document.createElement("button");
+            cancelButton.addEventListener("click",this.hideCal.bind(this));
+            cancelButton.innerText = "Cancel";
+            cancelButton.classList.add("cancelBtn");
+
+            buttons.appendChild(cancelButton);
+            buttons.appendChild(setButton);
+            
+            cal.appendChild(buttons);
+            document.body.appendChild(cal);
         }
-        var cal = document.createElement('div');
-        //cal.classList.add("cal-wrapper"); 
-        cal.id="cal";
-        cal.appendChild(this.calenderDom);
-        let buttons = document.createElement("div");
-        buttons.classList.add('action');
-
-        let setButton = document.createElement("button");
-        setButton.addEventListener("click",this.setDateAndHide.bind(this));
-        setButton.innerText = "Set";
-        setButton.classList.add("setbtn");
-
-
-        let cancelButton = document.createElement("button");
-        cancelButton.addEventListener("click",this.hideCal.bind(this));
-        cancelButton.innerText = "Cancel";
-        cancelButton.classList.add("cancelBtn");
-
-        buttons.appendChild(cancelButton);
-        buttons.appendChild(setButton);
-        
-        cal.appendChild(buttons);
-        document.body.appendChild(cal);
     }
 
     showCal(){
@@ -496,33 +470,128 @@ class Dp{
 
 
     minuteMouseOver(minute,option){
-        this.setSelectedOnmouseOver("minute",minute,option);
+        try{
+            this.setSelectedOnmouseOver("minute",minute,option);
+        }catch(err){
+            console.log(err.message);
+        }
     }
     hourMouseOver(hour,option){
-        this.setSelectedOnmouseOver("hour",hour,option);
+        try{
+            this.setSelectedOnmouseOver("hour",hour,option);
+        }catch(err){
+            console.log(err.message)
+        }
+        
     }
     dayMouseOver(day,option){
-        this.setSelectedOnmouseOver("day",day,option);
+        try{
+            this.setSelectedOnmouseOver("day",day,option);
+        }catch(err){
+            console.log(err.message)
+        }
+        
     }
 
     monthMouseOver(month,option){
-        this.setSelectedOnmouseOver("month",month,option);
+        try{
+            this.setSelectedOnmouseOver("month",month,option);
+        }catch(err){
+            console.log(err.message)
+        }
     }
 
     yearMouseOver(year,option){
-        this.setSelectedOnmouseOver("year",year,option);
+        try{
+            this.setSelectedOnmouseOver("year",year,option);
+        }catch(err){
+            console.log(err.message)
+        }
     }
 
     setSelectedOnmouseOver(selectedProperty,value,domElement){
-        domElement.selected = value;
-        this.selected[selectedProperty] = value;
-        this.setDate();
+        try{
+            this.validate(selectedProperty,value);
+            domElement.selected = value;
+            this.selected[selectedProperty] = value;
+            this.setDate();
+        }catch(err){
+            throw(err)
+        }
     }   
+
+    validate(property,newValue){
+        let newDate = this.selected;
+        newDate[property] = newValue;
+        console.log(newDate);
+        const dateTobeSet = new Date(newDate.year + "-" + (newDate.month + 1) + "-" + newDate.day + " " + newDate.hour + ":" + newDate.minute).getTime()/1000;  
+        if(this.min){
+            if(dateTobeSet < this.min){
+                var humanDate = this.getBasic(this.min);
+                throw new Error("You can not set a date before "+ humanDate.year + "-" + (humanDate.month + 1)+ "-" + humanDate.day + " " + humanDate.hour + ":" + humanDate.minutes);
+            }
+        }
+        else if(this.max){
+            if(dateTobeSet > this.max){
+                var humanDate = this.getBasic(this.max);
+                throw new Error("You can not set a date after "+ humanDate.year + "-" + (humanDate.month + 1)+ "-" + humanDate.day + " " + humanDate.hour + ":" + humanDate.minutes);
+            }
+        }else{
+            return
+        }
+    }
+
+    showError(message){
+        const messageWrapper = document.createElement("div");
+        messageWrapper.classList.add("err-message-wrapper");
+        messageWrapper.id = "messagebox";
+        const msgBox = document.createElement("div");
+        msgBox.classList.add("msg-box");
+        const msg = document.createElement("p");
+        const closeMsg = document.createElement("span");
+        closeMsg.classList.add("close-msg");
+        closeMsg.innerText = "X";
+        closeMsg.addEventListener("click",() => {
+            document.getElementById("messagebox").remove();
+        });
+        msg.innerText = message;
+        msgBox.appendChild(msg);
+        messageWrapper.appendChild(msgBox);
+    }
 
     setMin(timestamp){
 
     }
     setMax(timestamp){
 
+    }
+
+    getBasic(epoch = false){
+        var date = epoch ? new Date(epoch * 1000) : new Date;
+        var seconds = date.getSeconds();
+        var minutes = date.getMinutes();
+        var hour = date.getHours();
+        var year = date.getFullYear();
+        var month = date.getMonth(); // beware: January = 0; February = 1, etc.
+        var day = date.getDate();
+        var dayOfWeek = date.getDay(); // Sunday = 0, Monday = 1, etc.
+        var milliSeconds = date.getMilliseconds();
+        var days_in_months = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        if( (new Date(year, 1, 29)).getDate() == 29 ) days_in_months[1] = 29;
+
+        var basic = {
+            seconds:seconds,
+            minutes:minutes,
+            hour:hour,
+            year:year,
+            month:month,
+            monthName:this.monthNames[month],
+            day:day,
+            dayName:this.dayNames[dayOfWeek],
+            dayOfWeek:dayOfWeek,
+            milliSeconds:milliSeconds,
+            daysInMonths:days_in_months
+        }
+        return basic;
     }
 }

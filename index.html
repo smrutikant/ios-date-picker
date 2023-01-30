@@ -13,11 +13,12 @@ const options = {
     target:document.getElementById("mydate"),
     type:"basic",
     theme:"dark",
-    date:1674452603,
+    date:"2022-10-12 10:22",
     calenderOption:{
         displayTimeFormat: 24,
         interval:15
-    }
+    },
+    min:"2022-10-12 10:22"
 }
 const calIns = new Dp(options);
 </script>
@@ -91,12 +92,14 @@ option {
   display: flex;
   justify-content: center;
   align-items: center;
+  opacity: .3;
 }
 option:checked{
   z-index: 4;
   position: relative;
   padding: 2px;
   border-radius: 40px;
+  opacity: 1;
 }
 #cal {
   position: fixed;
